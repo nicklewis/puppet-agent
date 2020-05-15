@@ -1,0 +1,23 @@
+diff --git a/opt/puppetlabs/puppet/include/boost/asio/ssl/detail/impl/engine.ipp b/opt/puppetlabs/puppet/include/boost/asio/ssl/detail/impl/engine.ipp
+index 07f9123db..81d8217aa 100644
+--- a/opt/puppetlabs/puppet/include/boost/asio/ssl/detail/impl/engine.ipp
++++ b/opt/puppetlabs/puppet/include/boost/asio/ssl/detail/impl/engine.ipp
+@@ -241,14 +241,16 @@ engine::want engine::perform(int (engine::* op)(void*, std::size_t),
+   {
+     ec = boost::system::error_code(sys_error,
+         boost::asio::error::get_ssl_category());
+-    return want_nothing;
++    return pending_output_after > pending_output_before
++      ? want_output : want_nothing;
+   }
+ 
+   if (ssl_error == SSL_ERROR_SYSCALL)
+   {
+     ec = boost::system::error_code(sys_error,
+         boost::asio::error::get_system_category());
+-    return want_nothing;
++    return pending_output_after > pending_output_before
++      ? want_output : want_nothing;
+   }
+ 
+   if (result > 0 && bytes_transferred)

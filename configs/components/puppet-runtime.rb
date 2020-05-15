@@ -87,7 +87,13 @@ component 'puppet-runtime' do |pkg, settings, platform|
     install_command = ["gunzip -c #{tarball_name} | #{platform.tar} -k -C / -xf -"]
   end
 
+  pkg.apply_patch 'resources/patches/puppet-runtime/handle-ssl-errors.patch'
+
+  do_patch = <<~STR
+  patch -p1 /opt/puppetlabs/puppet/include/boost/asio/ssl/detail/impl/engine.ipp patches/puppet-runtime/handle-ssl-errors.patch
+  STR
+
   pkg.install do
-    install_command
+    install_command + [do_patch]
   end
 end
