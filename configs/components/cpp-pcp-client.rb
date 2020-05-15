@@ -6,6 +6,8 @@ component "cpp-pcp-client" do |pkg, settings, platform|
   toolchain = "-DCMAKE_TOOLCHAIN_FILE=/opt/pl-build-tools/pl-build-toolchain.cmake"
   make = platform[:make]
 
+  pkg.apply_patch 'resources/patches/cpp-pcp-client/enable-debug-logging.patch'
+
   if platform.is_windows?
     pkg.environment "PATH", "$(shell cygpath -u #{settings[:gcc_bindir]}):$(shell cygpath -u #{settings[:bindir]}):/cygdrive/c/Windows/system32:/cygdrive/c/Windows:/cygdrive/c/Windows/System32/WindowsPowerShell/v1.0"
   else

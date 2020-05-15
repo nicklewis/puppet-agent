@@ -1,0 +1,53 @@
+commit 43f47728dff0d9f0457bbc5c92aaf541b84a19a3
+Author: Michael Smith <michael.smith@puppet.com>
+Date:   Thu May 14 23:24:20 2020 +0000
+
+    Enable debug logging
+
+diff --git a/lib/inc/cpp-pcp-client/connector/connection.hpp b/lib/inc/cpp-pcp-client/connector/connection.hpp
+index ed517d0..7361c3f 100644
+--- a/lib/inc/cpp-pcp-client/connector/connection.hpp
++++ b/lib/inc/cpp-pcp-client/connector/connection.hpp
+@@ -27,7 +27,7 @@ namespace websocketpp {
+     class client;
+ 
+     namespace config {
+-        struct asio_tls_client;
++        struct debug_asio_tls;
+     }
+ 
+     namespace message_buffer {
+@@ -57,7 +57,7 @@ static const std::string DEFAULT_CLOSE_REASON { "Closed by client" };
+ 
+ // Configuration of the WebSocket transport layer
+ 
+-using WS_Client_Type = websocketpp::client<websocketpp::config::asio_tls_client>;
++using WS_Client_Type = websocketpp::client<websocketpp::config::debug_asio_tls>;
+ using WS_Context_Ptr = websocketpp::lib::shared_ptr<boost::asio::ssl::context>;
+ using WS_Connection_Handle = websocketpp::connection_hdl;
+ 
+diff --git a/lib/src/connector/connection.cc b/lib/src/connector/connection.cc
+index 953c92e..20d8b4b 100644
+--- a/lib/src/connector/connection.cc
++++ b/lib/src/connector/connection.cc
+@@ -22,7 +22,7 @@
+ #pragma GCC diagnostic ignored "-Wunused-variable"
+ #include <websocketpp/common/connection_hdl.hpp>
+ #include <websocketpp/client.hpp>
+-#include <websocketpp/config/asio_client.hpp>
++#include <websocketpp/config/debug_asio.hpp>
+ #ifndef _WIN32
+ #pragma GCC diagnostic pop
+ #endif
+@@ -85,8 +85,8 @@ Connection::Connection(std::vector<std::string> broker_ws_uris,
+           endpoint_ { new WS_Client_Type() }
+ {
+     // Turn off websocketpp logging to avoid runtime errors (see CTH-69)
+-    endpoint_->clear_access_channels(websocketpp::log::alevel::all);
+-    endpoint_->clear_error_channels(websocketpp::log::elevel::all);
++    endpoint_->set_access_channels(websocketpp::log::alevel::all);
++    endpoint_->set_error_channels(websocketpp::log::elevel::all);
+ 
+     // Initialize the transport system. Note that in perpetual mode,
+     // the event loop does not terminate when there are no connections
+
